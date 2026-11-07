@@ -392,30 +392,3 @@ def test_mail_ignore_list(settings):
     assert desk.ignored("Banca <NoReply@banca.it>")
     assert not desk.ignored("Mario Rossi <mario@negozio.it>")
     assert not desk.ignored("cliente@newsletter.it.example.com")
-
-
-async def test_hologram_follows_the_voice_satellite(make_hq):
-    hq = make_hq([])
-    events = hq.subscribe()
-    await hq._ha_event("state", "assist_satellite.cucina", {"state": "listening"})
-    await hq._ha_event("state", "light.salotto", {"state": "on"})
-    assert events.get_nowait() == {"type": "satellite", "e": "assist_satellite.cucina", "state": "listening"}
-    assert events.empty()
-
-
-def test_hologram_page_and_assist_voice_events(settings, make_hq):
-    hq = make_hq([response([text_block("Ciao, tutto bene.")], "end_turn")])
-    app = create_app(settings, hq=hq, start_workers=False)
-    with TestClient(app) as client:
-        r = client.get("/holo")
-        assert r.status_code == 200 and "holo.js" in r.text
-        assert r.headers["cache-control"] == "no-cache"
-        events = hq.subscribe()
-        client.post("/api/chat", json={"text": "Come va?", "channel": "assist", "voice": True})
-        voice = []
-        while not events.empty():
-            ev = events.get_nowait()
-            if ev["type"] == "voice":
-                voice.append((ev["phase"], ev["text"]))
-        assert voice[0] == ("heard", "Come va?")
-        assert voice[-1][0] == "reply" and "tutto bene" in voice[-1][1]

@@ -32,7 +32,6 @@ from hubnex.llm import run_agent_loop
 from hubnex.maildesk import MAIL_AGENT_ID, MailDesk
 from hubnex.pricing import call_cost
 from hubnex.store import Store
-from hubnex.holo import Holo
 from hubnex.tools import REGISTRY, SERVER_TOOLS, ToolContext, server_tool, to_text
 
 log = logging.getLogger("hubnex.hq")
@@ -135,7 +134,6 @@ class HQ:
             team = TelegramTeam(settings, self)
         self.team = team  # the Telegram group: Jarvis' bot plus one bot per agent that has one
         self.maildesk = MailDesk(self) if settings.mail.enabled else None
-        self.holo = Holo(self)  # the table hologram's panels
         self.alerts = Alerts(self)  # smart notifications about the house (no Claude)
         self.actions = ActionDesk(self)  # changes to other programs wait for the owner's ✅
         self.connectors = Connectors(self, org.connectors)  # the programs of your work (MCP)
@@ -214,10 +212,6 @@ class HQ:
             return
         if entity_id:
             self.alerts.on_state(entity_id, state)
-        if entity_id and entity_id.startswith("assist_satellite."):
-            # A voice satellite (the smart speaker): the hologram follows it live, listening,
-            # thinking and speaking in step with the speaker.
-            self.emit({"type": "satellite", "e": entity_id, "state": (state or {}).get("state")})
         if entity_id in self.casa.shown:
             self.emit({"type": "ha", "e": entity_id, "v": self.casa.compact(entity_id, state) if state else None})
 
@@ -784,8 +778,7 @@ class HQ:
             prompt += VOICE_HINT
         blocks = self.attachments.blocks(attachments) if attachments else []
         messages = fill_history(history, with_blocks(prompt, blocks))
-        holo = ["holo_show"] if self.holo.on else []  # only while a hologram is on: no cost otherwise
-        tool_names = list(dict.fromkeys(BOSS_TOOLS + self.org.boss_tools + ALWAYS_TOOLS + ["deadline_done"] + holo))
+        tool_names = list(dict.fromkeys(BOSS_TOOLS + self.org.boss_tools + ALWAYS_TOOLS + ["deadline_done"]))
         tool_defs, extra = await self._toolbox(BOSS_ID, tool_names, self.settings.model)
         await self.set_status(BOSS_ID, "thinking", None, task=text)
         try:

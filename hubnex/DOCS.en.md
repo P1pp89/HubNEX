@@ -28,7 +28,6 @@ Everything else is optional and can be added whenever you like, in this suggeste
 | Floor plan of the house | Home → ⚙ Floor plan | Home view |
 | Talking through Assist (app, speakers) | HubNEX integration + Voice assistants | Voice |
 | Voice in the dashboard | *Voice from Home Assistant* option or ElevenLabs | Voice |
-| Hologram on the table | screen + sheet at 45°, `/holo` page | Table hologram |
 | Telegram group | the bots' options | The Telegram group |
 | Work mailbox | IMAP/SMTP options | Work mailbox |
 | The programs of your work | `connectors` in `agents.yaml` | Connectors |
@@ -142,61 +141,6 @@ answers by voice (`telegram_voice_replies`). Transcription needs ElevenLabs.
 **About ElevenLabs (free plan):** voices from the public library can't be used through the API;
 the account can be blocked for "unusual activity" even with characters left. In these cases the
 error message says so.
-
-## Table hologram
-
-Jarvis' core floating over the table, like in the films: the smart speaker is the ears and the
-voice, the hologram is the face. It listens when the speaker listens, spins while Jarvis
-thinks, pulses while he speaks, writes what it heard and what he answers; at rest it shows the
-time.
-
-The trick is **Pepper's ghost**: a screen lying face up and a transparent sheet at 45° above it.
-The screen's black disappears and only what glows is left, hanging in the air. The page is
-`http://HOME-ASSISTANT-IP:8765/holo?token=HQ-TOKEN` (it needs the **HQ token** and the port, see
-*Using it outside Home Assistant*).
-
-**What you need**
-- **The screen**: an old tablet or phone (the cheapest way), or a Raspberry Pi 4/5 with a 7–10"
-  monitor and Chromium in full screen (`chromium --kiosk "http://…:8765/holo?token=…"`). On
-  Android, Fully Kiosk Browser keeps it always on; the page asks the screen to stay on anyway.
-  Tap once for full screen.
-- **The reflector**, either:
-  - **A single sheet** (recommended, bigger picture): clear 2–3 mm acrylic or, better,
-    teleprompter glass (*beam splitter*, brighter), as wide as the screen, fixed at 45° above
-    it. Page: `/holo` (the default layout).
-  - **A four-sided pyramid**: visible from every side. Four acrylic or PET trapezoids: long
-    side = a third of the screen's short side, short side = a sixth of the long side, height =
-    (long side − short side) × 0.7. Glued together and set tip down in the middle of the
-    screen. Page: `/holo?layout=pyramid`.
-- **A dim room** or a black box around it: the darker behind the sheet, the more solid the
-  hologram looks.
-
-**Blueprints**: as in the film, when the request is about something to look at, the core moves
-up and a glowing panel appears:
-- a **3D floor plan** turning slowly, with the rooms and devices involved lit up and their
-  state live. It appears by itself whenever Jarvis reads or controls something in the house
-  ("turn on the kitchen lights", "is the bathroom window open?"). It needs the Home view's
-  floor plan;
-- a live **camera** ("show me the entrance");
-- a **chart** of a sensor over the last hours ("how was the temperature last night?");
-- a **list** (deadlines, emails, steps) and a **card** (weather, summary of a search, a quote).
-
-The panel stays while Jarvis talks about it and goes away after about 45 seconds. Jarvis gets
-the panel tool only while a hologram is on: when it is off, it costs nothing.
-
-**Linking it to the speaker**: nothing to set up if the speaker is an Assist satellite
-(ESPHome, Wyoming… in Home Assistant it is an `assist_satellite.…` entity) and HubNEX is its
-conversation agent (see *Voice*). With several speakers the hologram follows them all; for
-just one: `&sat=assist_satellite.kitchen`.
-
-**Settings in the address**
-| | |
-| --- | --- |
-| `layout=pyramid` | four views for the pyramid |
-| `mirror=0` | not mirrored (mirrored by default, the reflection turns it back): for a holographic fan or a transparent screen |
-| `rotate=180` | when the picture comes out upside down (also `90`, `270`) |
-| `invert=1` | pyramid: views facing outwards instead of towards the centre |
-| `sat=…` | follow only this speaker |
 
 ## The Telegram group
 

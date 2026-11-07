@@ -605,16 +605,5 @@ export const EN = {
   "in pausa": "paused",
   "pulisce": "cleaning",
   "torna alla base": "returning to dock",
-  "tutto tranquillo": "all quiet",
-  "Token mancante o errato: apri la pagina con ?token=…": "Missing or wrong token: open the page with ?token=…",
-  "Tocca per lo schermo intero": "Tap for full screen",
-  "Collegamento alla telecamera…": "Connecting to the camera…",
-  "a riposo": "idle",
-  "chiusa a chiave": "locked",
-  "in apertura": "opening",
-  "in casa": "home",
-  "in chiusura": "closing",
-  "in riproduzione": "playing",
-  "raffresca": "cooling",
-  "riscalda": "heating"
+  "tutto tranquillo": "all quiet"
 };
