@@ -2,7 +2,9 @@
 // (a sheet of plexiglass at 45° over a screen lying face up, or a four-sided pyramid).
 // The smart speaker is the ears and the voice; this page is the face: it follows the voice
 // satellite (listening, thinking, speaking), what Jarvis is doing, and shows what the speaker
-// heard and what Jarvis answers.
+// heard and what Jarvis answers. When the request is about something to look at, a
+// "blueprint" takes the stage (holo-blueprint.js): the floor plan with the rooms and devices
+// involved, a camera, a chart, a list, a card.
 //
 // Options in the address:
 //   layout=single   one view (default): plexiglass sheet at 45°, or a holographic display
@@ -14,6 +16,7 @@
 //   token=…         HQ token, outside Home Assistant
 import { Orb, describeTool } from "./orb.js";
 import { t, LANG, LOCALE } from "./i18n.js";
+import { drawScene } from "./holo-blueprint.js";
 
 const Q = new URLSearchParams(location.search);
 const LAYOUT = Q.get("layout") === "pyramid" ? "pyramid" : "single";
@@ -44,7 +47,39 @@ const S = {
   textStart: 0,
   textUntil: 0,      // when the text fades away
   speakUntil: 0,     // answer spoken without a satellite (Assist in the app): speak this long
+  scene: null,       // the blueprint on stage (floor plan, camera, chart, list, card)
+  sceneStart: 0,
+  sceneUntil: 0,
+  mix: 0,            // 0 = the core alone, 1 = core small and the blueprint on stage
 };
+
+const SCENE_MS = 45000; // a blueprint stays this long after the last word about it
+
+// The camera on stage: a fresh frame every 2 seconds.
+const camImg = new Image();
+let camTimer = null;
+function watchCamera(entity) {
+  clearInterval(camTimer);
+  camTimer = null;
+  if (!entity) return;
+  const load = () => {
+    const next = new Image();
+    next.onload = () => { camImg.src = next.src; };
+    next.src = `api/casa/camera/${encodeURIComponent(entity)}?token=${encodeURIComponent(token)}&t=${Date.now()}`;
+  };
+  camImg.removeAttribute("src");
+  load();
+  camTimer = setInterval(load, 2000);
+}
+
+function setScene(scene) {
+  if (!scene || scene.kind === "clear") { S.sceneUntil = performance.now(); return; }
+  const same = S.scene && S.scene.kind === scene.kind && S.scene.title === scene.title && performance.now() < S.sceneUntil;
+  S.scene = scene;
+  if (!same) S.sceneStart = performance.now(); // a new blueprint draws itself again
+  S.sceneUntil = performance.now() + SCENE_MS;
+  watchCamera(scene.kind === "camera" ? scene.entity : null);
+}
 
 const SAT_BUSY = new Set(["listening", "processing", "responding"]);
 
@@ -83,6 +118,14 @@ function onEvent(ev) {
     S.sat = ev.state || "idle";
     if (S.sat === "listening" && prev !== "listening") S.text = ""; // a new question: clean slate
     if (S.sat === "responding") S.speakUntil = 0;
+  } else if (ev.type === "holo") {
+    setScene(ev.scene);
+    return;
+  } else if (ev.type === "ha") {
+    // A device on the floor plan changed: its state follows live.
+    const it = S.scene?.items?.find((i) => i.id === ev.e);
+    if (it && ev.v) it.state = ev.v.s;
+    return;
   } else if (ev.type === "voice") {
     setText(ev.phase, ev.text);
     // Assist without a speaker entity (the app, a browser): pretend to speak for a while.
@@ -96,7 +139,7 @@ let retry = 1000;
 function connect() {
   const url = new URL("ws", location.href);
   url.protocol = location.protocol === "https:" ? "wss:" : "ws:";
-  url.search = `?token=${encodeURIComponent(token)}`;
+  url.search = `?token=${encodeURIComponent(token)}&holo=1`;
   const ws = new WebSocket(url);
   ws.onopen = () => { retry = 1000; note(""); };
   ws.onmessage = (m) => { try { onEvent(JSON.parse(m.data)); } catch { /* not for us */ } };
@@ -143,28 +186,55 @@ function glowText(text, x, y, color, blur) {
   ctx.shadowBlur = 0;
 }
 
-// One view, drawn in a v×v box centred on the origin, the right way up.
+const lerp = (a, b, m) => a + (b - a) * m;
+
+// One view, drawn in a v×v box centred on the origin, the right way up. With a blueprint on
+// stage the core steps aside (small, top left) and the panel takes the middle.
 function drawView(v, now) {
   const [r, g, b] = orb.color.map(Math.round);
+  const m = S.mix;
   const bob = Math.sin(now / 1400) * v * 0.012; // it floats
-  const orbSize = v * 0.62;
-  const orbY = -v * 0.14 + bob;
-  ctx.drawImage(orb.canvas, -orbSize / 2, orbY - orbSize / 2, orbSize, orbSize);
+  const orbSize = v * lerp(0.62, 0.17, m);
+  const orbX = -v * lerp(0, 0.37, m);
+  const orbY = v * lerp(-0.14, -0.38, m) + bob;
+  ctx.drawImage(orb.canvas, orbX - orbSize / 2, orbY - orbSize / 2, orbSize, orbSize);
 
-  ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  let y = orbY + orbSize / 2 + v * 0.03;
-
-  // The state, as the dashboard says it ("In ascolto…", "Cerco sul web…").
   const caption = orb.captionEl.textContent;
-  if (caption) {
+
+  if (S.scene && m > 0.01) {
+    // The blueprint's title next to the small core, the state under it.
+    const tx = orbX + orbSize / 2 + v * 0.02;
+    ctx.globalAlpha = m;
+    ctx.textAlign = "left";
+    ctx.font = `600 ${Math.round(v * 0.05)}px Rajdhani, sans-serif`;
+    ctx.letterSpacing = `${(v * 0.004).toFixed(1)}px`;
+    ctx.fillStyle = "rgba(235,252,255,0.97)";
+    glowText(String(S.scene.title || "").toUpperCase().slice(0, 40), tx, orbY - v * 0.018, `rgba(${r},${g},${b},0.9)`, v * 0.02);
+    ctx.font = `500 ${Math.round(v * 0.026)}px Rajdhani, sans-serif`;
+    ctx.fillStyle = `rgba(${r},${g},${b},0.9)`;
+    ctx.fillText((caption || "").toUpperCase(), tx, orbY + v * 0.03);
+    ctx.letterSpacing = "0px";
+    const p = Math.min(1, (now - S.sceneStart) / 1400) * m;
+    drawScene(ctx, S.scene, { x: -v * 0.46, y: -v * 0.27, w: v * 0.92, h: v * 0.6 }, now, orb.color, p, camImg);
+    ctx.globalAlpha = 1;
+  }
+
+  ctx.textBaseline = "middle";
+  ctx.textAlign = "center";
+  const solo = 1 - m;
+  let y = orbY + orbSize / 2 + v * 0.03;
+  // The state under the big core ("In ascolto…", "Cerco sul web…").
+  if (caption && solo > 0.01) {
+    ctx.globalAlpha = solo;
     ctx.font = `600 ${Math.round(v * 0.036)}px Rajdhani, sans-serif`;
     ctx.letterSpacing = `${(v * 0.006).toFixed(1)}px`;
     ctx.fillStyle = `rgba(${r},${g},${b},0.95)`;
     glowText(caption.toUpperCase(), 0, y, `rgba(${r},${g},${b},0.9)`, v * 0.02);
     ctx.letterSpacing = "0px";
+    ctx.globalAlpha = 1;
   }
-  y += v * 0.06;
+  y = lerp(y + v * 0.06, v * 0.39, m);
 
   // What the speaker heard (in quotes), or Jarvis' answer typed in step with his voice.
   if (S.text && now < S.textUntil) {
@@ -172,16 +242,18 @@ function drawView(v, now) {
     let shown = S.text;
     if (S.textKind === "reply") shown = S.text.slice(0, Math.ceil(((now - S.textStart) / 1000) * 16));
     if (S.textKind === "heard") shown = `“${shown}”`;
-    const size = Math.round(v * 0.038);
+    const size = Math.round(v * lerp(0.038, 0.03, m));
     ctx.font = `${S.textKind === "heard" ? "italic 300" : "400"} ${size}px "Saira Semi Condensed", sans-serif`;
     ctx.fillStyle = S.textKind === "heard" ? `rgba(200,230,255,${0.75 * fade})` : `rgba(230,250,255,${0.95 * fade})`;
-    wrap(shown, v * 0.86, 4).forEach((line, i) => glowText(line, 0, y + i * size * 1.3, `rgba(${r},${g},${b},${0.7 * fade})`, v * 0.015));
-  } else if (orb.state === "idle") {
+    wrap(shown, v * 0.88, m > 0.5 ? 3 : 4).forEach((line, i) => glowText(line, 0, y + i * size * 1.3, `rgba(${r},${g},${b},${0.7 * fade})`, v * 0.015));
+  } else if (orb.state === "idle" && solo > 0.01) {
     // At rest: the time, faint, under the core.
     const time = new Date().toLocaleTimeString(LOCALE, { hour: "2-digit", minute: "2-digit" });
+    ctx.globalAlpha = solo;
     ctx.font = `500 ${Math.round(v * 0.07)}px Rajdhani, sans-serif`;
     ctx.fillStyle = `rgba(${r},${g},${b},0.45)`;
     glowText(time, 0, y + v * 0.02, `rgba(${r},${g},${b},0.6)`, v * 0.02);
+    ctx.globalAlpha = 1;
   }
 }
 
@@ -200,6 +272,11 @@ function frame(now) {
   if (orb.state === "speaking") orb.synthetic = 0.2 + 0.45 * Math.abs(Math.sin(now / 70) * Math.sin(now / 190));
   else if (orb.state === "listening") orb.synthetic = 0.12 + 0.25 * Math.abs(Math.sin(now / 90) * Math.sin(now / 230));
   if (S.speakUntil && now > S.speakUntil) { S.speakUntil = 0; update(); }
+  // The blueprint stays while Jarvis talks about it, then fades and the core returns.
+  if (S.scene && orb.state !== "idle") S.sceneUntil = Math.max(S.sceneUntil, now + 20000);
+  const on = S.scene && now < S.sceneUntil;
+  S.mix += ((on ? 1 : 0) - S.mix) * 0.06;
+  if (!on && S.scene && S.mix < 0.01) { S.scene = null; watchCamera(null); }
 
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   ctx.fillStyle = "#000";

@@ -171,6 +171,19 @@ The screen's black disappears and only what glows is left, hanging in the air. T
 - **A dim room** or a black box around it: the darker behind the sheet, the more solid the
   hologram looks.
 
+**Blueprints**: as in the film, when the request is about something to look at, the core moves
+up and a glowing panel appears:
+- a **3D floor plan** turning slowly, with the rooms and devices involved lit up and their
+  state live. It appears by itself whenever Jarvis reads or controls something in the house
+  ("turn on the kitchen lights", "is the bathroom window open?"). It needs the Home view's
+  floor plan;
+- a live **camera** ("show me the entrance");
+- a **chart** of a sensor over the last hours ("how was the temperature last night?");
+- a **list** (deadlines, emails, steps) and a **card** (weather, summary of a search, a quote).
+
+The panel stays while Jarvis talks about it and goes away after about 45 seconds. Jarvis gets
+the panel tool only while a hologram is on: when it is off, it costs nothing.
+
 **Linking it to the speaker**: nothing to set up if the speaker is an Assist satellite
 (ESPHome, Wyoming… in Home Assistant it is an `assist_satellite.…` entity) and HubNEX is its
 conversation agent (see *Voice*). With several speakers the hologram follows them all; for

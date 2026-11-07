@@ -166,6 +166,20 @@ sospeso nell'aria. La pagina è `http://IP-DI-HOME-ASSISTANT:8765/holo?token=TOK
 - **Una stanza in penombra** o una scatola nera intorno: più è buio dietro la lastra, più
   l'ologramma sembra solido.
 
+**I blueprint**: come nel film, quando la richiesta riguarda qualcosa da vedere il nucleo si
+sposta in alto e compare un pannello luminoso:
+- **piantina in 3D** che ruota lentamente, con le stanze e i dispositivi coinvolti accesi e il
+  loro stato dal vivo. Compare da sola ogni volta che Jarvis legge o comanda qualcosa in casa
+  ("accendi le luci in cucina", "la finestra del bagno è aperta?"). Serve la piantina della
+  vista Casa;
+- **telecamera** dal vivo ("fammi vedere l'ingresso");
+- **grafico** di un sensore nelle ultime ore ("com'è andata la temperatura stanotte?");
+- **elenco** (scadenze, email, passaggi) e **scheda** (meteo, riepilogo di una ricerca, un
+  preventivo).
+
+Il pannello resta finché Jarvis ne parla e sparisce dopo circa 45 secondi. Jarvis riceve lo
+strumento per i pannelli solo mentre un ologramma è acceso: spento, non costa nulla.
+
 **Collegarlo allo speaker**: non c'è niente da configurare se lo speaker è un satellite di
 Assist (ESPHome, Wyoming… in Home Assistant è un'entità `assist_satellite.…`) e HubNEX è il suo
 agente di conversazione (vedi *Voce*). Con più speaker l'ologramma li segue tutti; per uno

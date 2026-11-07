@@ -769,6 +769,8 @@ def create_app(settings: Settings | None = None, hq: HQ | None = None, start_wor
         await websocket.accept()
         hq: HQ = websocket.app.state.hq
         queue = hq.subscribe()
+        holo = websocket.query_params.get("holo") == "1" and role == "full"  # the table hologram
+        hq.holo.clients += holo
         try:
             state = await hq.snapshot()
             await websocket.send_json({"type": "snapshot", "state": state if role == "full" else house_only(state)})
@@ -780,6 +782,7 @@ def create_app(settings: Settings | None = None, hq: HQ | None = None, start_wor
             pass
         finally:
             hq.unsubscribe(queue)
+            hq.holo.clients -= holo
 
     return app
 

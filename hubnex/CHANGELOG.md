@@ -6,6 +6,12 @@
   o una piramide a quattro facce con `?layout=pyramid`). Segue lo smart speaker (le entità
   `assist_satellite` di Home Assistant): ascolta, pensa, parla, e scrive cosa ha sentito e cosa
   risponde Jarvis. A riposo mostra l'ora. Guida e materiali nella documentazione.
+- **Blueprint sull'ologramma**, come nel film: quando la richiesta riguarda qualcosa da vedere,
+  il nucleo si fa piccolo e compare un pannello. La **piantina in 3D** che ruota con le stanze e
+  i dispositivi coinvolti accesi (da sola, ogni volta che Jarvis legge o comanda qualcosa in
+  casa, con lo stato che cambia dal vivo), una **telecamera**, l'**andamento di un sensore**, un
+  **elenco** o una **scheda** (meteo, ricerche, preventivi). Jarvis ha lo strumento `holo_show`
+  solo mentre un ologramma è acceso: nessun costo in più quando è spento.
 
 ## 1.14.3
 - Telecamere dentro Home Assistant: le miniature dal vivo usano il video di Home Assistant

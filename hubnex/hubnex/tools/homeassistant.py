@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from hubnex.context import ORIGIN
+from hubnex.holo import targets
 from hubnex.tools import ToolContext, tool
 
 
@@ -34,7 +35,10 @@ async def ha_list_entities(ctx: ToolContext, inp: dict):
     ["entity_id"],
 )
 async def ha_get_state(ctx: ToolContext, inp: dict):
-    return await _ha(ctx).get_state(inp["entity_id"])
+    state = await _ha(ctx).get_state(inp["entity_id"])
+    if ORIGIN.get() == "owner":  # what you asked about appears on the hologram
+        ctx.hq.holo.touched([inp["entity_id"]])
+    return state
 
 
 @tool(
@@ -57,4 +61,5 @@ async def ha_call_service(ctx: ToolContext, inp: dict):
         )
     changed = await _ha(ctx).call_service(inp["domain"], inp["service"], inp.get("data") or {})
     await ctx.hq.log("ha", f"{inp['domain']}.{inp['service']} {inp.get('data') or ''}", ctx.agent_id)
+    ctx.hq.holo.touched(targets(inp.get("data"), changed))
     return {"ok": True, "entità_cambiate": changed}
