@@ -212,6 +212,10 @@ class HQ:
             return
         if entity_id:
             self.alerts.on_state(entity_id, state)
+        if entity_id and entity_id.startswith("assist_satellite."):
+            # A voice satellite (the smart speaker): the hologram follows it live, listening,
+            # thinking and speaking in step with the speaker.
+            self.emit({"type": "satellite", "e": entity_id, "state": (state or {}).get("state")})
         if entity_id in self.casa.shown:
             self.emit({"type": "ha", "e": entity_id, "v": self.casa.compact(entity_id, state) if state else None})
 

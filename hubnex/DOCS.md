@@ -23,6 +23,7 @@ Tutto il resto è facoltativo e si aggiunge quando vuoi, in quest'ordine consigl
 | Piantina della casa | Casa → ⚙ Piantina | Vista Casa |
 | Parlare con Assist (app, speaker) | integrazione HubNEX + Assistenti vocali | Voce |
 | Voce nella dashboard | opzione *Voce da Home Assistant* o ElevenLabs | Voce |
+| Ologramma sul tavolo | schermo + lastra a 45°, pagina `/holo` | Ologramma da tavolo |
 | Gruppo Telegram | opzioni dei bot | Il gruppo Telegram |
 | Posta di lavoro | opzioni IMAP/SMTP | Posta di lavoro |
 | I programmi del lavoro | `connectors` in `agents.yaml` | Connettori |
@@ -136,6 +137,48 @@ a voce (`telegram_voice_replies`). La trascrizione dei vocali richiede ElevenLab
 **Note su ElevenLabs (piano gratuito):** le voci prese dalla libreria pubblica non si possono
 usare tramite API; l'account può essere bloccato per "attività insolita" anche con caratteri
 disponibili. In questi casi il messaggio d'errore lo dice.
+
+## Ologramma da tavolo
+
+Il nucleo di Jarvis che fluttua sul tavolo, come nei film: lo smart speaker fa da orecchie e
+da voce, l'ologramma da volto. Ascolta quando lo speaker ascolta, gira quando Jarvis pensa,
+pulsa mentre parla, scrive cosa ha sentito e cosa risponde; a riposo mostra l'ora.
+
+Il trucco è il **fantasma di Pepper**: uno schermo sdraiato a faccia in su e una lastra
+trasparente inclinata a 45° sopra. Il nero dello schermo sparisce, resta solo ciò che brilla,
+sospeso nell'aria. La pagina è `http://IP-DI-HOME-ASSISTANT:8765/holo?token=TOKEN-HQ` (serve il
+**Token HQ** e la porta, vedi *Usarla fuori da Home Assistant*).
+
+**Cosa serve**
+- **Lo schermo**: un vecchio tablet o telefono (il modo più economico), oppure un Raspberry Pi
+  4/5 con un monitor da 7–10" e Chromium a schermo intero
+  (`chromium --kiosk "http://…:8765/holo?token=…"`). Su Android, Fully Kiosk Browser lo tiene
+  sempre acceso; la pagina chiede comunque allo schermo di non spegnersi. Tocca una volta per
+  lo schermo intero.
+- **Il riflettore**, a scelta:
+  - **Lastra singola** (consigliata, immagine più grande): plexiglass trasparente da 2–3 mm o,
+    meglio, vetro da teleprompter (*beam splitter*, più luminoso), largo quanto lo schermo,
+    fissato a 45° sopra di esso. Pagina: `/holo` (layout di serie).
+  - **Piramide a quattro facce**: si vede da tutti i lati. Quattro trapezi di plexiglass o PET:
+    lato lungo = un terzo del lato corto dello schermo, lato corto = un sesto del lato lungo,
+    altezza = (lato lungo − lato corto) × 0,7. Si incollano con la punta in giù al centro dello
+    schermo. Pagina: `/holo?layout=pyramid`.
+- **Una stanza in penombra** o una scatola nera intorno: più è buio dietro la lastra, più
+  l'ologramma sembra solido.
+
+**Collegarlo allo speaker**: non c'è niente da configurare se lo speaker è un satellite di
+Assist (ESPHome, Wyoming… in Home Assistant è un'entità `assist_satellite.…`) e HubNEX è il suo
+agente di conversazione (vedi *Voce*). Con più speaker l'ologramma li segue tutti; per uno
+solo: `&sat=assist_satellite.cucina`.
+
+**Regolazioni nell'indirizzo**
+| | |
+| --- | --- |
+| `layout=pyramid` | quattro viste per la piramide |
+| `mirror=0` | niente specchiatura (di serie è specchiato, il riflesso lo raddrizza): per un ventilatore olografico o uno schermo trasparente |
+| `rotate=180` | se l'immagine esce capovolta (anche `90`, `270`) |
+| `invert=1` | piramide: le viste girate verso l'esterno invece che verso il centro |
+| `sat=…` | segui solo questo speaker |
 
 ## Il gruppo Telegram
 

@@ -290,9 +290,14 @@ def create_app(settings: Settings | None = None, hq: HQ | None = None, start_wor
             response = await call_next(request)
         finally:
             REQUEST_LANG.reset(token)
-        if request.url.path == "/" or request.url.path.startswith("/static/"):
+        if request.url.path in ("/", "/holo") or request.url.path.startswith("/static/"):
             response.headers["Cache-Control"] = "no-cache"
         return response
+
+    @app.get("/holo", include_in_schema=False)
+    async def holo():
+        # The hologram: Jarvis' core alone on black, for a Pepper's ghost reflector on the table.
+        return FileResponse(WEB_DIR / "holo.html")
 
     app.mount("/static", StaticFiles(directory=WEB_DIR), name="static")
 
@@ -341,6 +346,9 @@ def create_app(settings: Settings | None = None, hq: HQ | None = None, start_wor
         files = attachments_for(hq, body.attachments)
         if not body.text.strip() and not files:
             raise HTTPException(422, tr("scrivi un messaggio o allega un file"))
+        assist = body.channel == "assist"
+        if assist:  # the hologram shows what the speaker heard
+            hq.emit({"type": "voice", "phase": "heard", "text": body.text[:500]})
         reply, spoken, by = await hq.converse(
             body.channel, body.text, voice=body.voice, spoken=body.speak,
             quick=body.voice or dashboard, local=dashboard, attachments=files,
@@ -348,6 +356,8 @@ def create_app(settings: Settings | None = None, hq: HQ | None = None, start_wor
         if body.voice and reply:
             reply = for_voice(reply)  # Assist reads it aloud: units and symbols as words
         out = {"reply": reply or tr("L'agente ha risposto direttamente nel gruppo Telegram."), "by": by}
+        if assist:  # ...and what Jarvis answers, while the speaker says it
+            hq.emit({"type": "voice", "phase": "reply", "text": (spoken or out["reply"])[:1500]})
         if spoken:
             out["spoken"] = spoken  # what the voice says of a long answer ("riassunto")
         return out

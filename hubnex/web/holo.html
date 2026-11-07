@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>HubNEX Holo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Saira+Semi+Condensed:wght@300;400&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="icon" href="static/icons/icon-192.png">
+  <style>
+    /* Black is "nothing" in a Pepper's ghost reflector: only what glows floats in the air. */
+    html, body { margin: 0; height: 100%; background: #000; overflow: hidden; cursor: none; touch-action: manipulation; }
+    #holo { display: block; width: 100vw; height: 100vh; }
+    /* The orb draws here off-screen; the page copies it into each view (mirrored/rotated). */
+    #orb-src { position: absolute; left: -10000px; top: 0; width: 520px; }
+    #orb-src canvas { width: 520px; height: 520px; }
+    #msg { position: fixed; inset: auto 0 24px 0; text-align: center; font: 15px "Saira Semi Condensed", sans-serif; color: #7fdcff; opacity: 0; transition: opacity .6s; pointer-events: none; }
+    #msg.on { opacity: .85; }
+  </style>
+</head>
+<body>
+  <canvas id="holo"></canvas>
+  <div id="orb-src" aria-hidden="true"><canvas></canvas><div class="orb-caption"></div></div>
+  <div id="msg" role="status"></div>
+  <script type="module" src="static/holo.js"></script>
+</body>
+</html>

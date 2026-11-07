@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.15.0
+- **Ologramma da tavolo**: la nuova pagina `/holo` mostra il nucleo di Jarvis da solo sul nero,
+  per un riflettore a "fantasma di Pepper" (uno schermo sdraiato e una lastra trasparente a 45°,
+  o una piramide a quattro facce con `?layout=pyramid`). Segue lo smart speaker (le entità
+  `assist_satellite` di Home Assistant): ascolta, pensa, parla, e scrive cosa ha sentito e cosa
+  risponde Jarvis. A riposo mostra l'ora. Guida e materiali nella documentazione.
+
 ## 1.14.3
 - Telecamere dentro Home Assistant: le miniature dal vivo usano il video di Home Assistant
   (lo stesso della vista grande in HD), non più l'MJPEG che con molte telecamere non arriva.

@@ -605,5 +605,7 @@ export const EN = {
   "in pausa": "paused",
   "pulisce": "cleaning",
   "torna alla base": "returning to dock",
-  "tutto tranquillo": "all quiet"
+  "tutto tranquillo": "all quiet",
+  "Token mancante o errato: apri la pagina con ?token=…": "Missing or wrong token: open the page with ?token=…",
+  "Tocca per lo schermo intero": "Tap for full screen"
 };
