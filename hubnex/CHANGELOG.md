@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.21.0
+- **Tema chiaro** per la Casa, ad alto contrasto, da leggere anche al sole: sfondo chiaro, card
+  bianche, testi scuri, ambra e rosso più pieni. In **⚙ → Tema**: Automatico (segue il
+  telefono), Scuro o Chiaro; la scelta resta sul dispositivo. HQ e Mappa restano scuri.
+
 ## 1.20.2
 - Card libera, stile **Pulito** come le card composte: etichette piccole, valori di misura
   media, una linea sopra ogni blocco che si accende quando l'entità è attiva, orari con −15/+15

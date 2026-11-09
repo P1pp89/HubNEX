@@ -426,6 +426,11 @@ la apre (non italiano = inglese). In alto **⚙ → Lingua** si sceglie a mano, 
 browser. Jarvis, gli agenti, Telegram e i messaggi dell'add-on seguono l'opzione **Lingua**
 nella configurazione (auto = quella di Home Assistant).
 
+**Tema chiaro, per leggere al sole**: in alto **⚙ → Tema**. **Automatico** segue il telefono
+(chiaro di giorno se il telefono è in chiaro), **Chiaro** e **Scuro** lo fissano. Vale per la
+Casa: HQ e Mappa restano scuri. La scelta resta su quel dispositivo, così il telefono può
+essere chiaro e il tablet a muro scuro.
+
 **Solo la Casa, per chi vuole solo accendere una luce**: in alto **⚙** → spegni **Schede HQ e
 Mappa** (HubNEX apre direttamente la Casa) e/o **Assistente AI** (spariscono chat, voce e
 approvazioni: nessun credito Claude). Dentro Home Assistant la scelta è salvata con l'account
