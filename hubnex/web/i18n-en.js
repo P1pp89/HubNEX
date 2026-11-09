@@ -497,6 +497,7 @@ export const EN = {
   "telecamere": "cameras",
   "temperatura": "temperature",
   "temperatura da": "temperature from",
+  "tocca per vederla": "tap to view",
   "tocca per vederle": "tap to view",
   "tocca una stanza": "tap a room",
   "togli": "remove",

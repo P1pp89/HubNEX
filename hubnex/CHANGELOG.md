@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.21.1
+- Tema chiaro: il riquadro in alto della Casa diventa un'unica card bianca, con le voci divise
+  da linee sottili (prima a scacchiera).
+- Con una sola telecamera: «tocca per vederla».
+
 ## 1.21.0
 - **Tema chiaro** per la Casa, ad alto contrasto, da leggere anche al sole: sfondo chiaro, card
   bianche, testi scuri, ambra e rosso più pieni. In **⚙ → Tema**: Automatico (segue il

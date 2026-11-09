@@ -1373,7 +1373,14 @@ html.light .casa-switch::after { background: #7b8ea3; }
 html.light .casa-switch.on { background: rgba(178, 106, 0, 0.18); border-color: var(--warn); }
 html.light .casa-switch.on::after { background: var(--warn); box-shadow: none; }
 /* the house's dashboard and plan */
-html.light .hud-row, html.light .hud-item { border-color: rgba(15, 40, 70, 0.14); }
+html.light .hud-row { background: #fff; border: 1px solid rgba(15, 40, 70, 0.12); border-radius: 12px; padding: 2px 4px; box-shadow: 0 1px 3px rgba(15, 40, 70, 0.06); }
+html.light .hud-item { border-color: rgba(15, 40, 70, 0.12); }
+html.light .hud-item, html.light button.hud-item { background: none; }
+html.light button.hud-item:hover { background: rgba(0, 103, 159, 0.05); }
+@media (max-width: 1100px) {
+  html.light .hud-item { padding: 12px 6px; gap: 10px; }
+  html.light .hud-item:nth-child(n+3) { border-top: 1px solid rgba(15, 40, 70, 0.1); }
+}
 html.light .hud-wx .wx, html.light .wx-now .wx.big { filter: none; }
 html.light .plan { border-color: rgba(0, 103, 159, 0.45); box-shadow: 0 8px 30px rgba(15, 40, 70, 0.15); background-color: #fff;
   background-image: linear-gradient(rgba(0, 103, 159, 0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 103, 159, 0.07) 1px, transparent 1px); }
